@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="gu"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#14233b"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><title>પોલીસ કેસ મેનેજમેન્ટ (ડેમો)</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f5;--sf:#fff;--tx:#14233b;--mu:#5d6b80;--ac:#14233b;--br:#b08d3c;--ln:#d5dbe5;--rd:#b3261e;--ok:#1f7a4d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1626;--sf:#17233a;--tx:#e8edf5;--mu:#98a6bb;--ac:#2a4067;--br:#d3ae5c;--ln:#2b3a55}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 "Noto Sans Gujarati",system-ui,sans-serif;padding-bottom:70px}
+header{background:var(--ac);color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--br)}
+header h1{font-size:17px;margin:0}header small{opacity:.8}
+main{padding:14px;max-width:640px;margin:auto}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:10px;padding:14px;margin-bottom:12px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--sf);border-left:4px solid var(--br);border-radius:4px;padding:10px 12px}
+.stat b{font-size:26px;display:block}.stat span{color:var(--mu);font-size:14px}
+input,select,textarea{width:100%;padding:10px;margin:4px 0 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit}
+label{font-size:14px;color:var(--mu);font-weight:600}
+button{font:inherit;font-weight:600;border:0;border-radius:6px;padding:11px 16px;background:var(--ac);color:#fff;cursor:pointer}
+button.alt{background:transparent;color:var(--tx);border:1px solid var(--ln)}button.br{background:var(--br);color:#14233b}button.bad{background:var(--rd)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid var(--br);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--sf);border-top:1px solid var(--ln);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;background:none;color:var(--mu);border-radius:0;padding:12px 2px;font-size:12px}nav button.on{color:var(--tx);box-shadow:inset 0 3px var(--br)}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;background:var(--bg);border:1px solid var(--ln);font-size:13px;margin-right:4px}
+.item{padding:10px 0;border-bottom:1px solid var(--ln);cursor:pointer}.item:last-child{border:0}
+.ph{width:72px;height:88px;border-radius:6px;background:var(--bg);border:1px solid var(--ln);object-fit:cover;display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:12px}
+.err{color:var(--rd);font-size:14px}.ok{color:var(--ok);font-size:14px}.mu{color:var(--mu);font-size:14px}
+a{color:var(--tx)}
+#rep{display:none}
+@media print{body>*:not(#rep){display:none!important}#rep{display:block;color:#000;background:#fff;padding:20px}#rep table{width:100%;border-collapse:collapse}#rep td{border:1px solid #000;padding:6px}}
+</style></head><body>
+<div id="app"></div><div id="rep"></div>
+<script>
+const T={gu:{dash:"ડેશબોર્ડ",add:"ઉમેરો",search:"સર્ચ",rep:"રિપોર્ટ",set:"સેટિંગ્સ"},en:{dash:"Dashboard",add:"Add",search:"Search",rep:"Reports",set:"Settings"}};
+const DEMO={admin:{p:"demo123",role:"Admin",name:"એડમિન (ડેમો)",badge:"A-001"},tapas:{p:"demo123",role:"તપાસ અધિકારી",name:"તપાસ અધિકારી (ડેમો)",badge:"GJ-1234"},senior:{p:"demo123",role:"વરિષ્ઠ અધિકારી",name:"વરિષ્ઠ અધિકારી (ડેમો)",badge:"GJ-0099"}};
+const PERM={"Admin":["view","edit","approve","admin"],"તપાસ અધિકારી":["view","edit"],"વરિષ્ઠ અધિકારી":["view","approve"]};
+const seed=[{id:1,name:"ડેમો વ્યક્તિ એક",father:"ડેમો પિતા",dob:"1990-01-01",role:"આરોપી",mobile:"9000000001",idType:"ડેમો ID",idNo:"DEMO12345678",addr:"ડેમો સરનામું, અમદાવાદ",occ:"મજૂર",fir:"11199999/2026",ps:"ડેમો પોલીસ સ્ટેશન",sec:"IPC 000 (ડેમો)",det:"કાલ્પનિક કેસ વિગત",dt:"2026-11-01T10:30",officer:"તપાસ અધિકારી (ડેમો)",badge:"GJ-1234",status:"તપાસ ચાલુ",court:"2026-11-20",rel:[{n:"ડેમો સંબંધી",r:"ભાઈ",m:"9000000002"}],veh:[{t:"બાઇક",m:"ડેમો મોડેલ",no:"GJ01XX0000",c:"કાળો"}],lat:23.0225,lng:72.5714,acc:"20",approved:false,photo:""}];
+let S,user=null,view="dash",lang="gu",sel=null,tmp={};
+const load=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+S={recs:[],log:[],bk:null};let KEY=null,SALT=null,idle=null,tmpBk="";
+const b64=b=>{let s="",u=new Uint8Array(b);for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode(...u.subarray(i,i+8192));return btoa(s)},ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function mk(pin,salt){const k=await crypto.subtle.importKey("raw",new TextEncoder().encode(pin),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:200000,hash:"SHA-256"},k,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
+async function seal(key,salt){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,new TextEncoder().encode(JSON.stringify({recs:S.recs,log:S.log,users:S.users})));return JSON.stringify({s:b64(salt),i:b64(iv),c:b64(ct)})}
+async function openV(v,pin){const o=JSON.parse(v),salt=ub(o.s),key=await mk(pin,salt);const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:ub(o.i)},key,ub(o.c));return{key,salt,data:JSON.parse(new TextDecoder().decode(pt))}}
+function pinScreen(){const has=localStorage.getItem("pm_vault");$("#app").innerHTML=`<main><div class="card" style="margin-top:8vh"><h1 style="margin:0 0 4px;font-size:20px">${has?"ડેટા PIN દાખલ કરો":"ડેટા PIN બનાવો"}</h1><p class="mu">${has?"આ PIN થી ફોનનો ડેટા ખુલે છે.":"ઓછામાં ઓછા 6 અંક. PIN ભૂલી જશો તો ડેટા પાછો મળશે નહીં."}</p><input id="pin" type="password" inputmode="numeric" autocomplete="off">${has?"":'<input id="pin2" type="password" inputmode="numeric" placeholder="PIN ફરી લખો">'}<div id="e" class="err"></div><button onclick="doPin()" style="width:100%">${has?"ખોલો":"PIN સેટ કરો"}</button></div></main>`}
+async function doPin(){const pin=$("#pin").value,has=localStorage.getItem("pm_vault"),e=$("#e");try{if(has){const r=await openV(has,pin);KEY=r.key;SALT=r.salt;S.recs=r.data.recs;S.log=r.data.log;S.users=r.data.users||S.users}else{if(!/^\d{6,}$/.test(pin)){e.textContent="PIN ઓછામાં ઓછા 6 અંકનો હોવો જોઈએ.";return}if(pin!==$("#pin2").value){e.textContent="બંને PIN સરખા નથી.";return}SALT=crypto.getRandomValues(new Uint8Array(16));KEY=await mk(pin,SALT);S.recs=seed;S.log=[];["pm_recs","pm_log","pm_bk"].forEach(k=>localStorage.removeItem(k))}}catch(x){e.textContent="PIN ખોટો છે.";return}if(!S.users)await seedUsers();persist();render();arm()}
+function lock(){KEY=null;SALT=null;S={recs:[],log:[],bk:null};user=null;pend=null;view="dash";tmpBk="";render()}
+function arm(){clearTimeout(idle);if(KEY)idle=setTimeout(lock,120000)}
+["click","keydown","touchstart"].forEach(ev=>addEventListener(ev,arm));
+
+const $=s=>document.querySelector(s),can=p=>user&&PERM[user.role].includes(p);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const persist=()=>{if(!KEY)return;seal(KEY,SALT).then(v=>{try{localStorage.setItem("pm_vault",v)}catch(e){}})};
+const audit=(a,d)=>{S.log.unshift({t:new Date().toLocaleString("gu-IN"),u:user?user.badge:"-",a,d});persist()};
+const mask=s=>s?s.slice(0,2)+"•".repeat(Math.max(s.length-4,2))+s.slice(-2):"-";
+const age=d=>d?Math.floor((Date.now()-new Date(d))/31557600000):"-";
+function render(){
+ if(!KEY)return pinScreen();if(!user)return login();
+ const m={dash,add:addF,search:srch,rep,set,detail}[view]();
+ $("#app").innerHTML=`<header><div><h1>પોલીસ કેસ મેનેજમેન્ટ</h1><small>${esc(user.name)} · ${esc(user.role)}</small></div><button class="alt" style="color:#fff;border-color:#ffffff66" onclick="logout()">લોગઆઉટ</button></header><main>${m}</main><nav>${["dash","add","search","rep","set"].map(k=>`<button class="${view==k?"on":""}" onclick="go('${k}')">${T[lang][k]}</button>`).join("")}</nav>`;
+ if(view=="add")bind();
+}
+const go=v=>{view=v;sel=null;render()};
+function login(){const dm=Object.values(S.users||{}).some(u=>u.demo);
+ $("#app").innerHTML=`<main><div class="card" style="margin-top:8vh"><h1 style="margin:0 0 4px;font-size:20px">અધિકૃત પોલીસ પ્રવેશ</h1><p class="mu">ફક્ત અધિકૃત અધિકારીઓ માટે.${dm?" ડેમો: admin / tapas / senior · પાસવર્ડ demo123":""}</p><label>યુઝરનેમ</label><input id="u" autocomplete="username" autocapitalize="none"><label>પાસવર્ડ</label><input id="p" type="password" autocomplete="current-password"><div id="e" class="err"></div><div class="row"><button onclick="doLogin()">લોગિન</button><button class="alt" onclick="forgot()">પાસવર્ડ ભૂલી ગયા?</button></div></div></main>`}
+let pend=null;
+let fails=0;
+async function hp(pw,salt){return b64(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(salt+":"+pw)))}
+const nsalt=()=>b64(crypto.getRandomValues(new Uint8Array(12)));
+async function mkUser(k,pw,role,name,badge,demo){const salt=nsalt();S.users[k]={salt,h:await hp(pw,salt),role,name,badge,demo:!!demo}}
+async function seedUsers(){S.users={};for(const k in DEMO){const d=DEMO[k];await mkUser(k,d.p,d.role,d.name,d.badge,true)}}
+async function doLogin(){const k=$("#u").value.trim().toLowerCase(),u=(S.users||{})[k],e=$("#e");
+ if(!u||u.h!==await hp($("#p").value,u.salt)){audit("લોગિન નિષ્ફળ",k);if(++fails>=5){fails=0;lock();return}e.textContent="યુઝરનેમ અથવા પાસવર્ડ ખોટો છે.";return}
+ fails=0;user={u:k,name:u.name,role:u.role,badge:u.badge,demo:u.demo};audit("લોગિન","સફળ");render();arm()}
+async function forgot(){if(confirm("ડેટા PIN થી ડેટા ખુલ્લો છે. બધા યુઝરને ડેમો પાસવર્ડ (demo123) પર રીસેટ કરવા છે? રેકોર્ડ બદલાશે નહીં.")){await seedUsers();audit("યુઝર રીસેટ","બધા");persist();render()}}
+function logout(){audit("લોગઆઉટ","");user=null;view="dash";render()}
+function dash(){
+ const v=S.recs.reduce((a,r)=>a+r.veh.length,0);
+ return (user.demo?'<div class="card err">ડેમો પાસવર્ડ ચાલુ છે. સેટિંગ્સ → “પાસવર્ડ બદલો” થી બદલો.</div>':"")+`<div class="stats"><div class="stat"><b>${S.recs.length}</b><span>વ્યક્તિના રેકોર્ડ</span></div><div class="stat"><b>${S.recs.length}</b><span>કુલ કેસ</span></div><div class="stat"><b>${S.recs.filter(r=>r.dt).length}</b><span>અટકાયત</span></div><div class="stat"><b>${v}</b><span>વાહનોની નોંધ</span></div></div>
+ <div class="row" style="margin:12px 0"><button onclick="go('search')">ઝડપી સર્ચ</button>${can("edit")?`<button class="br" onclick="go('add')">નવો રેકોર્ડ</button>`:""}</div>
+ <div class="card"><b>તાજેતરના રેકોર્ડ</b>${S.recs.slice(-5).reverse().map(item).join("")||'<p class="mu">હજુ કોઈ રેકોર્ડ નથી. “નવો રેકોર્ડ” દબાવો.</p>'}</div>`;
+}
+const item=r=>`<div class="item" onclick="open_(${r.id})"><b>${esc(r.name)}</b> <span class="tag">${esc(r.role)}</span><div class="mu">FIR ${esc(r.fir)} · ${esc(r.status)}${r.approved?" · ✔ મંજૂર":""}</div></div>`;
+function open_(id){sel=id;audit("રેકોર્ડ જોયો","ID "+id);view="detail";render()}
+function srch(){
+ return `<div class="card"><input id="q" placeholder="નામ / મોબાઇલ / ID / FIR / વાહન નંબર" oninput="doSearch()"><div id="res" class="mu">સર્ચ કરવા ટાઈપ કરો.</div></div>`;
+}
+function doSearch(){
+ const q=$("#q").value.trim().toLowerCase(),box=$("#res");if(!q){box.textContent="સર્ચ કરવા ટાઈપ કરો.";return}
+ const f=S.recs.filter(r=>[r.name,r.mobile,r.idNo,r.fir,...r.veh.map(v=>v.no)].some(x=>String(x||"").toLowerCase().includes(q)));
+ box.innerHTML=f.length?f.map(r=>`<div class="item" onclick="open_(${r.id})"><b>${esc(r.name)}</b> <span class="tag">${esc(r.role)}</span><div class="mu">મો. ${esc(r.mobile)} · ID ${mask(r.idNo)} · FIR ${esc(r.fir)}</div></div>`).join(""):"કોઈ રેકોર્ડ મળ્યો નથી.";
+}
+function addF(){
+ if(!can("edit"))return `<div class="card err">તમારી પાસે રેકોર્ડ ઉમેરવાની પરવાનગી નથી.</div>`;
+ tmp={photo:"",lat:"",lng:"",acc:"",gt:""};
+ return `<div class="card"><p class="mu">ફક્ત અધિકૃત અને કાયદેસર રીતે મેળવેલી માહિતી દાખલ કરો.</p>
+ <b>વ્યક્તિની વિગત</b><br><label>પૂરું નામ *</label><input id="name"><label>પિતાનું નામ</label><input id="father"><div class="row"><div><label>જન્મ તારીખ</label><input id="dob" type="date"></div><div><label>ભૂમિકા</label><select id="role"><option>આરોપી</option><option>શંકાસ્પદ</option><option>સંબંધિત વ્યક્તિ</option></select></div></div>
+ <label>મોબાઇલ નંબર</label><input id="mobile" inputmode="tel"><div class="row"><div><label>ઓળખપત્ર પ્રકાર</label><input id="idType"></div><div><label>ઓળખપત્ર નંબર</label><input id="idNo"></div></div>
+ <label>સરનામું</label><textarea id="addr" rows="2"></textarea><label>વ્યવસાય</label><input id="occ">
+ <label>ફોટો (કેમેરા / ગેલેરી)</label><input id="ph" type="file" accept="image/*" capture="environment"><img id="pv" class="ph" style="display:none">
+ <b>સંબંધી</b><div class="row"><input id="rn" placeholder="નામ"><input id="rr" placeholder="સંબંધ"><input id="rm" placeholder="મોબાઇલ"></div>
+ <b>વાહન</b><div class="row"><input id="vt" placeholder="પ્રકાર"><input id="vm" placeholder="કંપની/મોડેલ"><input id="vn" placeholder="રજી. નંબર"><input id="vc" placeholder="રંગ"></div>
+ <b>અટકાયત અને કેસ</b><br><div class="row"><div><label>FIR નંબર *</label><input id="fir"></div><div><label>પોલીસ સ્ટેશન</label><input id="ps"></div></div>
+ <label>કલમો</label><input id="sec"><label>કેસની વિગત</label><textarea id="det" rows="2"></textarea>
+ <div class="row"><div><label>અટકાયત તારીખ-સમય</label><input id="dt" type="datetime-local"></div><div><label>કોર્ટ તારીખ</label><input id="court" type="date"></div></div>
+ <label>કેસની સ્થિતિ</label><select id="status"><option>તપાસ ચાલુ</option><option>કોર્ટમાં રજૂ</option><option>જામીન</option><option>બંધ</option></select>
+ <button class="alt" onclick="gps()" style="width:100%">📍 GPS લોકેશન મેળવો</button><div id="gs" class="mu">લોકેશન મેળવવા પરવાનગી આપવી પડશે.</div>
+ <label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="gok" style="width:auto;margin:0"> અધિકારી તરીકે હું આ લોકેશન મંજૂર કરું છું</label>
+ <div id="fe" class="err"></div><button class="br" style="width:100%" onclick="saveRec()">રેકોર્ડ સેવ કરો</button></div>`;
+}
+function bind(){$("#ph").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const c=document.createElement("canvas"),k=Math.min(1,300/i.width);c.width=i.width*k;c.height=i.height*k;c.getContext("2d").drawImage(i,0,0,c.width,c.height);tmp.photo=c.toDataURL("image/jpeg",.7);const p=$("#pv");p.src=tmp.photo;p.style.display="block"};i.src=r.result};r.readAsDataURL(f)}}
+function gps(){
+ const g=$("#gs");if(!navigator.geolocation){g.textContent="આ ડિવાઇસમાં GPS ઉપલબ્ધ નથી.";return}
+ g.textContent="લોકેશન મેળવી રહ્યા છીએ…";
+ navigator.geolocation.getCurrentPosition(p=>{tmp.lat=p.coords.latitude.toFixed(6);tmp.lng=p.coords.longitude.toFixed(6);tmp.acc=Math.round(p.coords.accuracy);tmp.gt=new Date().toLocaleString("gu-IN");
+  g.innerHTML=`Lat ${tmp.lat}, Lng ${tmp.lng} · ચોકસાઈ ±${tmp.acc} મી · ${tmp.gt}<br><a href="https://www.google.com/maps?q=${tmp.lat},${tmp.lng}" target="_blank" rel="noopener">Google Maps પર જુઓ</a>`},
+ e=>{g.textContent="લોકેશન મળ્યું નથી: પરવાનગી ચાલુ કરો અને ફરી પ્રયાસ કરો."},{enableHighAccuracy:true,timeout:15000});
+}
+function saveRec(){
+ const v=i=>$("#"+i).value.trim();
+ if(!v("name")||!v("fir")){$("#fe").textContent="નામ અને FIR નંબર જરૂરી છે.";return}
+ const id=Math.max(0,...S.recs.map(r=>r.id))+1;
+ S.recs.push({id,name:v("name"),father:v("father"),dob:v("dob"),role:v("role"),mobile:v("mobile"),idType:v("idType"),idNo:v("idNo"),addr:v("addr"),occ:v("occ"),fir:v("fir"),ps:v("ps"),sec:v("sec"),det:v("det"),dt:v("dt"),officer:user.name,badge:user.badge,status:v("status"),court:v("court"),
+  rel:v("rn")?[{n:v("rn"),r:v("rr"),m:v("rm")}]:[],veh:v("vn")?[{t:v("vt"),m:v("vm"),no:v("vn"),c:v("vc")}]:[],lat:tmp.lat,lng:tmp.lng,acc:tmp.acc,gok:$("#gok").checked,photo:tmp.photo,approved:false});
+ audit("રેકોર્ડ ઉમેર્યો","ID "+id);persist();open_(id);
+}
+function detail(){
+ const r=S.recs.find(x=>x.id==sel);if(!r)return "";
+ const map=r.lat?`<a href="https://www.google.com/maps?q=${r.lat},${r.lng}" target="_blank" rel="noopener">Google Maps (${r.lat}, ${r.lng})</a> · ±${r.acc}મી${r.gok?" · અધિકારી મંજૂર":""}`:"નોંધાયેલ નથી";
+ return `<button class="alt" onclick="go('search')">← પાછા</button><div class="card" style="margin-top:10px"><div class="row" style="flex-wrap:nowrap"><div style="flex:0 0 72px">${r.photo?`<img class="ph" src="${r.photo}">`:'<div class="ph">ફોટો નથી</div>'}</div><div><h2 style="margin:0;font-size:19px">${esc(r.name)}</h2><span class="tag">${esc(r.role)}</span><div class="mu">પિતા: ${esc(r.father)} · ઉંમર ${age(r.dob)}</div></div></div>
+ <p>મોબાઇલ: ${esc(r.mobile)}<br>ID: ${esc(r.idType)} ${can("approve")||can("admin")?esc(r.idNo):mask(r.idNo)}<br>સરનામું: ${esc(r.addr)}<br>વ્યવસાય: ${esc(r.occ)}</p>
+ <p><b>કેસ</b><br>FIR: ${esc(r.fir)} · ${esc(r.ps)}<br>કલમો: ${esc(r.sec)}<br>${esc(r.det)}<br>અટકાયત: ${esc(r.dt.replace("T"," "))} · ${esc(r.officer)} (${esc(r.badge)})<br>સ્થિતિ: ${esc(r.status)} · કોર્ટ: ${esc(r.court)}</p>
+ <p><b>સંબંધી</b><br>${r.rel.map(x=>esc(x.n)+" ("+esc(x.r)+") "+esc(x.m)).join("<br>")||"-"}</p><p><b>વાહન</b><br>${r.veh.map(x=>esc(x.t)+" "+esc(x.m)+" "+esc(x.no)+" "+esc(x.c)).join("<br>")||"-"}</p><p><b>સ્થળ</b><br>${map}</p>
+ <div class="row"><button onclick="pdf(${r.id})">PDF રિપોર્ટ</button>${can("approve")&&!r.approved?`<button class="br" onclick="appr(${r.id})">રિપોર્ટ મંજૂર કરો</button>`:""}${can("admin")?`<button class="bad" onclick="del(${r.id})">ડિલીટ</button>`:""}</div></div>`;
+}
+function appr(id){S.recs.find(r=>r.id==id).approved=true;audit("રિપોર્ટ મંજૂર","ID "+id);persist();render()}
+function del(id){if(confirm("આ રેકોર્ડ કાયમ માટે ડિલીટ કરવો છે?")){S.recs=S.recs.filter(r=>r.id!=id);audit("રેકોર્ડ ડિલીટ","ID "+id);persist();go("dash")}}
+function pdf(id){
+ const r=S.recs.find(x=>x.id==id);audit("PDF બનાવ્યો","ID "+id);
+ $("#rep").innerHTML=`<h2 style="text-align:center">ગુજરાત પોલીસ — વ્યક્તિ/કેસ રિપોર્ટ (ડેમો)</h2>${r.photo?`<img src="${r.photo}" style="width:90px;float:right">`:""}<table><tr><td>નામ</td><td>${esc(r.name)}</td></tr><tr><td>પિતા</td><td>${esc(r.father)}</td></tr><tr><td>ભૂમિકા</td><td>${esc(r.role)}</td></tr><tr><td>FIR / સ્ટેશન</td><td>${esc(r.fir)} / ${esc(r.ps)}</td></tr><tr><td>કલમો</td><td>${esc(r.sec)}</td></tr><tr><td>અટકાયત</td><td>${esc(r.dt)} — ${esc(r.officer)} (${esc(r.badge)})</td></tr><tr><td>સંબંધી</td><td>${r.rel.map(x=>esc(x.n)+" "+esc(x.r)).join(", ")}</td></tr><tr><td>વાહન</td><td>${r.veh.map(x=>esc(x.m)+" "+esc(x.no)).join(", ")}</td></tr><tr><td>લોકેશન</td><td>${r.lat?`https://www.google.com/maps?q=${r.lat},${r.lng}`:"-"}</td></tr></table><p>રિપોર્ટ તારીખ: ${new Date().toLocaleString("gu-IN")}<br>બનાવનાર: ${esc(user.name)} (${esc(user.badge)})</p><p style="margin-top:50px">ડિજિટલ સહી: ____________________</p>`;
+ setTimeout(()=>window.print(),100);
+}
+function rep(){return `<div class="card"><b>રિપોર્ટ</b>${S.recs.map(r=>`<div class="item" onclick="open_(${r.id})">${esc(r.name)} · FIR ${esc(r.fir)} ${r.approved?"✔":""}</div>`).join("")||'<p class="mu">રેકોર્ડ નથી.</p>'}<p class="mu">રેકોર્ડ ખોલી “PDF રિપોર્ટ” દબાવો, પછી પ્રિન્ટ વિન્ડોમાં “PDF તરીકે સેવ” પસંદ કરો.</p></div>`}
+function set(){
+ return `<div class="card"><b>બેકઅપ અને રિસ્ટોર</b><p class="mu">છેલ્લું બેકઅપ: ${esc(load("pm_bkt")||"હજુ નથી")}</p><button onclick="backup()">એન્ક્રિપ્ટેડ બેકઅપ બનાવો</button>${tmpBk?`<textarea id="bt" rows="4" readonly style="margin-top:10px">${esc(tmpBk)}</textarea><button class="alt" onclick="cp()">કોપી કરો</button><p class="mu">આ ટેક્સ્ટ કોપી કરી નોટ્સ, ઇમેઇલ કે Drive માં સાચવો. તે તમારા PIN વગર ખુલશે નહીં.</p>`:""}<hr style="border:0;border-top:1px solid var(--ln);margin:14px 0"><label>રિસ્ટોર: બેકઅપ ટેક્સ્ટ પેસ્ટ કરો કે ફાઇલ પસંદ કરો</label><textarea id="rt" rows="3"></textarea><input type="file" accept=".txt,.json" onchange="rfile(event)"><input id="rp" type="password" inputmode="numeric" placeholder="તે બેકઅપનો PIN"><button class="alt" onclick="restore()">રિસ્ટોર કરો</button></div>
+ ${usersCard()}<div class="card"><b>ભાષા</b><div class="row"><button class="${lang=="gu"?"":"alt"}" onclick="lang='gu';render()">ગુજરાતી</button><button class="${lang=="en"?"":"alt"}" onclick="lang='en';render()">English</button></div></div>
+ ${can("admin")?`<div class="card"><b>ઓડિટ લોગ</b>${S.log.slice(0,15).map(l=>`<div class="item mu" style="cursor:default">${esc(l.t)} · ${esc(l.u)} · ${esc(l.a)} ${esc(l.d)}</div>`).join("")}</div>`:'<div class="card mu">ઓડિટ લોગ ફક્ત Admin જોઈ શકે છે.</div>'}
+ <div class="card mu">તમામ ડેટા ફક્ત આ ફોનમાં, તમારા PIN થી AES-256 એન્ક્રિપ્ટ થઈને સ્ટોર થાય છે. 2 મિનિટ નિષ્ક્રિય રહેવાથી એપ આપમેળે લોક થાય છે. બ્રાઉઝર ડેટા ક્લિયર કરશો તો ડેટા જશે, એટલે નિયમિત બેકઅપ લો.</div>`;
+}
+function usersCard(){const L=Object.keys(S.users||{});
+ return `<div class="card"><b>પાસવર્ડ બદલો</b><input id="op" type="password" placeholder="જૂનો પાસવર્ડ"><input id="np" type="password" placeholder="નવો પાસવર્ડ (ઓછામાં ઓછા 6)"><button onclick="chPw()">પાસવર્ડ બદલો</button></div>`+(can("admin")?`<div class="card"><b>યુઝર મેનેજમેન્ટ</b>${L.map(k=>`<div class="item" style="cursor:default"><b>${esc(k)}</b> <span class="tag">${esc(S.users[k].role)}</span><div class="row" style="margin-top:6px"><button class="alt" onclick="admPw('${k}')">પાસવર્ડ રીસેટ</button>${k!==user.u?`<button class="bad" onclick="admDel('${k}')">ડિલીટ</button>`:""}</div></div>`).join("")}<label style="margin-top:12px;display:block">નવો યુઝર ઉમેરો</label><input id="nu" placeholder="યુઝરનેમ (અંગ્રેજી)" autocapitalize="none"><input id="nn" placeholder="પૂરું નામ"><input id="nb" placeholder="બકલ નંબર"><select id="nr"><option>તપાસ અધિકારી</option><option>વરિષ્ઠ અધિકારી</option><option>Admin</option></select><input id="nw" type="password" placeholder="પાસવર્ડ (ઓછામાં ઓછા 6)"><button class="br" onclick="addUser()">યુઝર ઉમેરો</button></div>`:"")}
+async function chPw(){const u=S.users[user.u];if(u.h!==await hp($("#op").value,u.salt))return alert("જૂનો પાસવર્ડ ખોટો છે.");const n=$("#np").value;if(n.length<6)return alert("નવો પાસવર્ડ ઓછામાં ઓછા 6 અક્ષરનો રાખો.");u.salt=nsalt();u.h=await hp(n,u.salt);delete u.demo;user.demo=false;audit("પાસવર્ડ બદલ્યો",user.u);persist();alert("પાસવર્ડ બદલાયો.");render()}
+async function admPw(k){const n=prompt("'"+k+"' માટે નવો પાસવર્ડ (ઓછામાં ઓછા 6):");if(!n||n.length<6)return;const u=S.users[k];u.salt=nsalt();u.h=await hp(n,u.salt);delete u.demo;audit("પાસવર્ડ રીસેટ",k);persist();render()}
+function admDel(k){if(confirm(k+" ને ડિલીટ કરવો છે?")){delete S.users[k];audit("યુઝર ડિલીટ",k);persist();render()}}
+async function addUser(){const k=$("#nu").value.trim().toLowerCase(),w=$("#nw").value;if(!/^[a-z0-9_.]{3,20}$/.test(k))return alert("યુઝરનેમ 3-20 અક્ષર, ફક્ત અંગ્રેજી અક્ષર/અંક.");if(S.users[k])return alert("આ યુઝરનેમ પહેલેથી છે.");if(w.length<6)return alert("પાસવર્ડ ઓછામાં ઓછા 6 અક્ષરનો રાખો.");await mkUser(k,w,$("#nr").value,$("#nn").value.trim()||k,$("#nb").value.trim(),false);audit("યુઝર ઉમેર્યો",k);persist();render()}
+async function backup(){tmpBk=await seal(KEY,SALT);save("pm_bkt",new Date().toLocaleString("gu-IN"));audit("બેકઅપ","");render()}
+function cp(){navigator.clipboard.writeText(tmpBk).then(()=>alert("કોપી થયું."),()=>{$("#bt").select()})}
+function rfile(e){const f=e.target.files[0];if(f){const r=new FileReader();r.onload=()=>{$("#rt").value=r.result};r.readAsText(f)}}
+async function restore(){const v=$("#rt").value.trim();if(!v){alert("બેકઅપ ટેક્સ્ટ પેસ્ટ કરો.");return}try{const r=await openV(v,$("#rp").value);if(!confirm("હાલનો ડેટા બદલાશે. ચાલુ રાખવું છે?"))return;S.recs=r.data.recs;S.log=r.data.log;S.users=r.data.users||S.users;audit("રિસ્ટોર","");go("dash")}catch(e){alert("PIN ખોટો છે અથવા બેકઅપ ખરાબ છે.")}}
+render();
+</script><script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></body></html>
